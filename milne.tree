@@ -1,0 +1,50 @@
+MyHouse has a Type of Location
+
+CP2150RATND has a Type of Router
+CP2150RATND has an "IPv4 Address" of 192.168.0.1
+CP2150RATND is connected to MyHouse via Physical
+CP2150RATND has a "Firmware Number" of "20.3.c.0501-MR22.1-RA"
+CP2150RATND has a "Model" of "Technicolor DJA0231"
+CP2150RATND has a "Telcom" of "Telstra"
+CP2150RATND has a "WiFi" of "TelstraDD8ED9"
+
+"TA-Mesh-WLAN-82EC" has a Type of "Router"
+"TA-Mesh-WLAN-82EC" has a "Sub Type" of "WiFi Booster"
+"TA-Mesh-WLAN-82EC" is connected to CP2150RATND via WiFi
+"TA-Mesh-WLAN-82EC" has an "IPv4 Address" of "192.168.0.67"
+"TA-Mesh-WLAN-82EC" has an "IPv6 Address" of "2001:8003:448e:9000:f6ca:e7ff:fe61:82ec"
+
+"TA-Mesh-WLAN-F532" is a Router
+"TA-Mesh-WLAN-F532" has a "Sub Type" of "WiFi Boost"
+"TA-Mesh-WLAN-F532" is connected to CP2150RATND via WiFi
+"TA-Mesh-WLAN-F532" has an "IPv4 Address" of "192.168.0.183"
+"TA-Mesh-WLAN-F532" has an "IPv6 Address" of "2001:8003:448e:9000:56b7:bdff:fe88:f532"
+
+"48-a5-e7-d8-a7-36" has an "IPv4 Address" of "192.168.0.68"
+"48-a5-e7-d8-a7-36" is connected to CP2150RATND via WiFi
+
+"Sue-s-A52" is a Phone
+"Sue-s-A52" is connected to "TA-Mesh-WLAN-F532" via WiFi
+"Sue-s-A52" has an "IPv4 Address" of "192.168.0.6"
+"Sue-s-A52" has an "IPv6 Address" of "2001:8003:448e:9000:49c4:1a01:f3f7:27f0"
+
+RPi is connected to CP2150RATND via Ethernet
+RPi has an "IPv4 Address" of "192.168.0.184"
+RPi has an "Network ID" of "4c:b0:08:17:bb:03"
+RPi has an OS of "Debian"
+
+"DESKTOP-RHHGQOT" is connected to CP2150RATND via WiFi
+"DESKTOP-RHHGQOT" has an "IPv4 Address" of "192.168.0.187"
+"DESKTOP-RHHGQOT" has a "Primary IPv6 Address" of "2001:8003:448e:9000:8cd9:b0ff:fe3c:94d2"
+"DESKTOP-RHHGQOT" has a "Secondary IPv6 Address" of "2001:8003:448e:9000:a8e7:21d8:a5d2:9592"
+"DESKTOP-RHHGQOT" has an OS of "Red Hat Linux"
+"DESKTOP-RHHGQOT" is a Laptop
+
+"Charles-s-A21s" is a Phone
+"Charles-s-A21s" is connected to "TA-Mesh-WLAN-82EC" via WiFi
+"Charles-s-A21s" has an OS of "Android"
+"Charles-s-A21s" has an "IPv6 Address" of "192.168.0.23"
+
+"Unknown-0c-56-5c-a3-a1-e2" is connected to "TA-Mesh-WLAN-82EC" via WiFi
+"Unknown-0c-56-5c-a3-a1-e2" has an "IPv4 Address" of "192.168.0.9"
+"Unknown-0c-56-5c-a3-a1-e2" has an "IPv6 Address" of "2001:8003:448e:9000:e56:5cff:fea3:a1e2"
