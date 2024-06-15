@@ -209,9 +209,9 @@ VM:{prefix}LegendVM is connected to Legend:{prefix}LegendLoc
 Unknown:{prefix}LegendUnknown has a Blurb of "no type given"
 Unknown:{prefix}Legend is connected to Legend:{prefix}LegendLoc
 
-Unknown:{prefix}Legend2 has a Shape of "triangle"
-Unknown:{prefix}Legend2 has a Blurb of "Custom shapes are provided by the Shape attribute.\\nAnything that DOT/graphviz would understand is accepted."
-Unknown:{prefix}Legend2 is connected to Legend:{prefix}LegendLoc via Physical
+Shape:{prefix}Legend2 has a Shape of "triangle"
+Shape:{prefix}Legend2 has a Blurb of "Custom shapes are provided by the Shape attribute.\\nAnything that DOT/graphviz would understand is accepted."
+Shape:{prefix}Legend2 is connected to Legend:{prefix}LegendLoc via Physical
 	""".format(prefix=secrets.token_hex(16)).split("\n")
 
 def main(tree, output_filename, require_legend=True):
@@ -363,13 +363,13 @@ def main(tree, output_filename, require_legend=True):
 						edges[o_a + ":sw" + o_b.split(":", 1)[0] + rel['kind'].lower()]
 					except KeyError:
 						edges[o_a + ":sw" + o_b.split(":", 1)[0] + rel['kind'].lower()] = True
-						sub.edge(o_a + ":sw", o_b.split(":", 1)[0], color=colour_v)
+						sub.edge(o_a + ":sw", o_b.split(":", 1)[0], color=colour_v, dir='both')
 				else:
 					try:
 						edges[o_a + o_b.split(":", 1)[0] + rel['kind'].lower()]
 					except KeyError:
 						edges[o_a + o_b.split(":", 1)[0] + rel['kind'].lower()] = True
-						sub.edge(o_a, o_b.split(":", 1)[0], color=colour_v)
+						sub.edge(o_a, o_b.split(":", 1)[0], color=colour_v, dir='both')
 
 	p = pathlib.Path(output_filename)
 	dot.format = p.suffix[1:]
@@ -391,6 +391,8 @@ def cli():
 
 	tree = parse_file(args.input_file, args.legend)
 	main(tree, args.output_file, args.legend)
+
+	# TODO: Only render legend option...?
 
 if __name__ == "__main__":
 	cli()
