@@ -191,23 +191,23 @@ Router:{prefix}LegendRouter has a IPAddress of 192.168.0.1
 Router:{prefix}LegendRouter is connected to Legend:{prefix}LegendLoc via Physical
 
 Switch:{prefix}LegendSwitch has a Type of Switch
-Switch:{prefix}LegendSwitch is connected to Router:{prefix}LegendRouter via Ethernet
+Switch:{prefix}LegendSwitch is connected to Legend:{prefix}LegendLoc via Ethernet
 
 Phone:{prefix}LegendPhone has a Type of Phone
-Phone:{prefix}LegendPhone is connected to Switch:{prefix}LegendSwitch via WiFi
+Phone:{prefix}LegendPhone is connected to Legend:{prefix}LegendLoc via WiFi
 
 PC:{prefix}LegendPC has a Type of PC
-PC:{prefix}LegendPC is connected to Switch:{prefix}LegendSwitch via Ethernet
+PC:{prefix}LegendPC is connected to Legend:{prefix}LegendLoc via Ethernet
 
 Laptop:{prefix}LegendLaptop has a Type of Laptop
-Laptop:{prefix}LegendLaptop is connected to Switch:{prefix}LegendSwitch via WiFi
-Laptop:{prefix}LegendLaptop is connected to Switch:{prefix}LegendSwitch via Ethernet
+Laptop:{prefix}LegendLaptop is connected to Legend:{prefix}LegendLoc via WiFi
+Laptop:{prefix}LegendLaptop is connected to Legend:{prefix}LegendLoc via Ethernet
 
 VM:{prefix}LegendVM has a Type of VirtualMachine
-VM:{prefix}LegendVM is connected to PC:{prefix}LegendPC
+VM:{prefix}LegendVM is connected to Legend:{prefix}LegendLoc
 
 Unknown:{prefix}LegendUnknown has a Blurb of "no type given"
-Unknown:{prefix}Legend is connected to PC:{prefix}LegendPC
+Unknown:{prefix}Legend is connected to Legend:{prefix}LegendLoc
 
 Unknown:{prefix}Legend2 has a Shape of "triangle"
 Unknown:{prefix}Legend2 has a Blurb of "Custom shapes are provided by the Shape attribute.\\nAnything that DOT/graphviz would understand is accepted."
@@ -215,7 +215,11 @@ Unknown:{prefix}Legend2 is connected to Legend:{prefix}LegendLoc via Physical
 	""".format(prefix=secrets.token_hex(16)).split("\n")
 
 def main(tree, output_filename, require_legend=True):
-	dot = Digraph(graph_attr = {'splines':'ortho', 'strict': 'false', 'overlap': 'false'})
+	dot = Digraph(graph_attr = {
+		'splines':'ortho',
+		'strict': 'false',
+		'overlap': 'false'}, engine='neato')
+
 	#dot = Digraph(graph_attr = {"concentrate": "true", 'strict': 'false', 'overlap': 'false'})
 
 	names = []
@@ -249,6 +253,7 @@ def main(tree, output_filename, require_legend=True):
 	}
 	# TODO: Allow colour, other properties, overriding...?
 
+	edges = {}
 	for row in proper_tree:
 		with dot.subgraph() as sub:
 			try:
@@ -354,9 +359,17 @@ def main(tree, output_filename, require_legend=True):
 					colour_v = colour_scheme['other']
 
 				if o_a == o_b:
-					sub.edge(o_a + ":sw", o_b.split(":", 1)[0], color=colour_v)
+					try:
+						edges[o_a + ":sw" + o_b.split(":", 1)[0] + rel['kind'].lower()]
+					except KeyError:
+						edges[o_a + ":sw" + o_b.split(":", 1)[0] + rel['kind'].lower()] = True
+						sub.edge(o_a + ":sw", o_b.split(":", 1)[0], color=colour_v)
 				else:
-					sub.edge(o_a, o_b.split(":", 1)[0], color=colour_v)
+					try:
+						edges[o_a + o_b.split(":", 1)[0] + rel['kind'].lower()]
+					except KeyError:
+						edges[o_a + o_b.split(":", 1)[0] + rel['kind'].lower()] = True
+						sub.edge(o_a, o_b.split(":", 1)[0], color=colour_v)
 
 	p = pathlib.Path(output_filename)
 	dot.format = p.suffix[1:]
