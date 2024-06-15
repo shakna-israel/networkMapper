@@ -13,6 +13,8 @@ def get(source, index):
 	except IndexError:
 		return type(source)()
 
+# TODO: Allow defining a new type, that has a scheme of attributes attached. (X is a new Type, X has a Shape of box3d, etc.)
+
 def parse_line(index, line):
 	r = {}
 	r['kind'] = 'metadata'
@@ -65,7 +67,7 @@ def parse_line(index, line):
 
 	return r
 
-def parse_file(filename):
+def parse_file(filename, require_legend=True):
 	r = {
 		'metadata': [],
 		'statement': []
@@ -81,14 +83,15 @@ def parse_file(filename):
 				else:
 					r['statement'].append(x['content'])
 			index = index + 1
-		for line in legend():
-			if line and line.rstrip() and line.rstrip()[0] != '#':
-				x = parse_line(index, line.strip())
-				if x['kind'] == 'metadata':
-					r['metadata'].append(x['content'])
-				else:
-					r['statement'].append(x['content'])
-			index = index + 1
+		if require_legend:
+			for line in legend():
+				if line and line.rstrip() and line.rstrip()[0] != '#':
+					x = parse_line(index, line.strip())
+					if x['kind'] == 'metadata':
+						r['metadata'].append(x['content'])
+					else:
+						r['statement'].append(x['content'])
+				index = index + 1
 
 	r2 = []
 	for statement in r['statement']:
@@ -165,7 +168,23 @@ def retree(names, data):
 
 def legend():
 	return """Legend:{prefix}LegendLoc has a Type of Location
-Legend:{prefix}LegendLoc has a Blurb of "Blue indicates an Ethernet Connection. Green indicates a WiFi Connection. Black, a Physical Connection. Grey, for any unspecified or unknown connections. All items may have a blurb, such as this. They may also have any arbitrary attribute, such as an IPAddress, OS, or any named key."
+Legend:{prefix}LegendLoc has a Blurb of "All items may have a Blurb, such as this. They may also have any arbitrary attribute, such as an IPAddress, OS, or any named key."
+
+Ethernet:{prefix}LegendVMEth has a Shape of box3d
+Ethernet:{prefix}LegendVMEth is connected to Legend:{prefix}LegendLoc via Ethernet
+Ethernet:{prefix}LegendVMEth has a Blurb of "Blue lines indicate an Ethernet Connection."
+
+WiFi:{prefix}LegendVMWifi has a Shape of box3d
+WiFi:{prefix}LegendVMWifi is connected to Legend:{prefix}LegendLoc via WiFi
+WiFi:{prefix}LegendVMWifi has a Blurb of "Green lines indicate a WiFi Connection."
+
+Physical:{prefix}LegendVMPhys has a Shape of box3d
+Physical:{prefix}LegendVMPhys is connected to Legend:{prefix}LegendLoc via Physical
+Physical:{prefix}LegendVMPhys has a Blurb of "Black lines indicate a Physical Connection."
+
+Unknown:{prefix}LegendVMUknown has a Shape of box3d
+Unknown:{prefix}LegendVMUknown is connected to Legend:{prefix}LegendLoc
+Unknown:{prefix}LegendVMUknown has a Blurb of "Grey lines specify an unknown connection type."
 
 Router:{prefix}LegendRouter has a Type of Router
 Router:{prefix}LegendRouter has a IPAddress of 192.168.0.1
@@ -182,15 +201,20 @@ PC:{prefix}LegendPC is connected to Switch:{prefix}LegendSwitch via Ethernet
 
 Laptop:{prefix}LegendLaptop has a Type of Laptop
 Laptop:{prefix}LegendLaptop is connected to Switch:{prefix}LegendSwitch via WiFi
+Laptop:{prefix}LegendLaptop is connected to Switch:{prefix}LegendSwitch via Ethernet
 
 VM:{prefix}LegendVM has a Type of VirtualMachine
 VM:{prefix}LegendVM is connected to PC:{prefix}LegendPC
 
 Unknown:{prefix}LegendUnknown has a Blurb of "no type given"
 Unknown:{prefix}Legend is connected to PC:{prefix}LegendPC
+
+Unknown:{prefix}Legend2 has a Shape of "triangle"
+Unknown:{prefix}Legend2 has a Blurb of "Custom shapes are provided by the Shape attribute.\\nAnything that DOT/graphviz would understand is accepted."
+Unknown:{prefix}Legend2 is connected to Legend:{prefix}LegendLoc via Physical
 	""".format(prefix=secrets.token_hex(16)).split("\n")
 
-def main(tree, output_filename):
+def main(tree, output_filename, require_legend=True):
 	dot = Digraph(graph_attr = {'splines':'ortho', 'strict': 'false', 'overlap': 'false'})
 	#dot = Digraph(graph_attr = {"concentrate": "true", 'strict': 'false', 'overlap': 'false'})
 
@@ -223,6 +247,7 @@ def main(tree, output_filename):
 		"location": "house",
 		"unknown": "doublecircle"
 	}
+	# TODO: Allow colour, other properties, overriding...?
 
 	for row in proper_tree:
 		with dot.subgraph() as sub:
@@ -232,10 +257,20 @@ def main(tree, output_filename):
 				shape_a = symbol_shapes['unknown']
 
 			try:
+				shape_a = data[row['Name A']]['meta']['Shape']
+			except KeyError:
+				pass
+
+			try:
 				meta_details = data[row['Name A']]['meta'].copy()
 				try:
 					meta_details['Blurb']
 					del meta_details['Blurb']
+				except KeyError:
+					pass
+				try:
+					meta_details['Shape']
+					del meta_details['Shape']
 				except KeyError:
 					pass
 				details_a = json.dumps(meta_details, indent=4, sort_keys=True)[1:-1]
@@ -248,10 +283,20 @@ def main(tree, output_filename):
 				shape_b = symbol_shapes['unknown']
 
 			try:
+				shape_b = data[row['Name A']]['meta']['Shape']
+			except KeyError:
+				pass
+
+			try:
 				meta_details = data[row['Name B']]['meta'].copy()
 				try:
 					meta_details['Blurb']
 					del meta_details['Blurb']
+				except KeyError:
+					pass
+				try:
+					meta_details['Shape']
+					del meta_details['Shape']
 				except KeyError:
 					pass
 				details_b = json.dumps(meta_details, indent=4, sort_keys=True)[1:-1]
@@ -313,11 +358,14 @@ def cli():
 	parser = argparse.ArgumentParser(description='Render a network tree.')
 	parser.add_argument('-i', '--input-file', help='The input file to parse.', required=True)
 	parser.add_argument('-o', '--output-file', help='The output file to render.', required=True)
+	parser.add_argument('-l', '--legend', help='Add the legend to the output', action='store_true')
+	parser.add_argument('-nl', '--no-legend', dest='legend', action='store_false')
+	parser.set_defaults(legend=True)
 
 	args = parser.parse_args()
 
-	tree = parse_file(args.input_file)
-	main(tree, args.output_file)
+	tree = parse_file(args.input_file, args.legend)
+	main(tree, args.output_file, args.legend)
 
 if __name__ == "__main__":
 	cli()
