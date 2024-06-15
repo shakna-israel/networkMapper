@@ -344,14 +344,26 @@ def main(tree, output_filename, require_legend=True):
 			sub.node(name=idents[row['Name B']])
 			sub.node(idents[row['Name B']], label=label_b, tooltip = details_b, shape = shape_b, fillcolor = "red")
 
-			if idents[row['Name A']] == idents[row['Name B']]:
-				sub.edge(idents[row['Name A']] + ":sw", idents[row['Name B']].split(":", 1)[0], color=color_a)
-			else:
-				sub.edge(idents[row['Name A']], idents[row['Name B']].split(":", 1)[0], color=color_a)
+			for rel in data[row['Name A']]['relations']:
+				o_a = idents[row['Name A']]
+				o_b = idents[rel['to']]
+
+				try:
+					colour_v = colour_scheme[rel['kind'].lower()]
+				except (IndexError, KeyError):
+					colour_v = colour_scheme['other']
+
+				if o_a == o_b:
+					sub.edge(o_a + ":sw", o_b.split(":", 1)[0], color=colour_v)
+				else:
+					sub.edge(o_a, o_b.split(":", 1)[0], color=colour_v)
 
 	p = pathlib.Path(output_filename)
 	dot.format = p.suffix[1:]
-	dot.render(p.stem)
+	return dot.render(p.stem)
+
+# TODO: Group types
+# TODO: Ranges to generate multiples according to a template.
 
 def cli():
 	import argparse
