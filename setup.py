@@ -7,5 +7,5 @@ setup(
 	'console_scripts': ['networkMapper = networkMapper:cli'],},
 	long_description=open('README.md').read(),
 	install_requires=['graphviz'],
-	version="1.1.0"
+	version="1.1.1"
 )
