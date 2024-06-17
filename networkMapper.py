@@ -65,6 +65,9 @@ def parse_line(index, line):
 	else:
 		print("WARNING: Line skipped.", line, file=sys.stderr)
 
+	# todo: y connects to x via
+	# todo: y connect to x
+
 	return r
 
 def parse_file(filename, require_legend=True):
@@ -118,7 +121,13 @@ def assemble_dtree(names, idents, tree):
 					data[name]['meta']
 				except KeyError:
 					data[name]['meta'] = {}
-				data[name]['meta'][k] = v
+
+				try:
+					if not isinstance(data[name]['meta'][k], list):
+						data[name]['meta'][k] = [data[name]['meta'][k]]
+					data[name]['meta'][k].append(v)
+				except KeyError:
+					data[name]['meta'][k] = v
 		except KeyError:
 			pass
 
@@ -273,11 +282,19 @@ def main(tree, output_filename, require_legend=True):
 					del meta_details['Blurb']
 				except KeyError:
 					pass
+
 				try:
 					meta_details['Shape']
 					del meta_details['Shape']
 				except KeyError:
 					pass
+
+				try:
+					meta_details['DisplayName']
+					del meta_details['DisplayName']
+				except KeyError:
+					pass
+
 				details_a = json.dumps(meta_details, indent=4, sort_keys=True)[1:-1]
 			except KeyError:
 				details_a = ''
@@ -288,7 +305,7 @@ def main(tree, output_filename, require_legend=True):
 				shape_b = symbol_shapes['unknown']
 
 			try:
-				shape_b = data[row['Name A']]['meta']['Shape']
+				shape_b = data[row['Name B']]['meta']['Shape']
 			except KeyError:
 				pass
 
@@ -299,11 +316,19 @@ def main(tree, output_filename, require_legend=True):
 					del meta_details['Blurb']
 				except KeyError:
 					pass
+
 				try:
 					meta_details['Shape']
 					del meta_details['Shape']
 				except KeyError:
 					pass
+
+				try:
+					meta_details['DisplayName']
+					del meta_details['DisplayName']
+				except KeyError:
+					pass
+
 				details_b = json.dumps(meta_details, indent=4, sort_keys=True)[1:-1]
 			except KeyError:
 				details_b = ''
@@ -344,7 +369,7 @@ def main(tree, output_filename, require_legend=True):
 			label_b = label_b + blurb_b + "\n" + details_b
 
 			sub.node(name=idents[row['Name A']])
-			sub.node(idents[row['Name A']], label=label_a, tooltip = details_a, shape = shape_a, fillcolor = "red")
+			sub.node(idents[row['Name A']], label=label_a, tooltip = details_a, shape = shape_a, fillcolor = "red", margin="1.2")
 
 			sub.node(name=idents[row['Name B']])
 			sub.node(idents[row['Name B']], label=label_b, tooltip = details_b, shape = shape_b, fillcolor = "red")
@@ -363,13 +388,13 @@ def main(tree, output_filename, require_legend=True):
 						edges[o_a + ":sw" + o_b.split(":", 1)[0] + rel['kind'].lower()]
 					except KeyError:
 						edges[o_a + ":sw" + o_b.split(":", 1)[0] + rel['kind'].lower()] = True
-						sub.edge(o_a + ":sw", o_b.split(":", 1)[0], color=colour_v, dir='both')
+						sub.edge(o_a + ":sw", o_b.split(":", 1)[0], color=colour_v, dir='both', label=rel['kind'].lower())
 				else:
 					try:
 						edges[o_a + o_b.split(":", 1)[0] + rel['kind'].lower()]
 					except KeyError:
 						edges[o_a + o_b.split(":", 1)[0] + rel['kind'].lower()] = True
-						sub.edge(o_a, o_b.split(":", 1)[0], color=colour_v, dir='both')
+						sub.edge(o_a, o_b.split(":", 1)[0], color=colour_v, dir='both', label=rel['kind'].lower())
 
 	p = pathlib.Path(output_filename)
 	dot.format = p.suffix[1:]
