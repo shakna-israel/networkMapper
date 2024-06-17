@@ -11,7 +11,7 @@ def get(source, index):
 	try:
 		return source[index]
 	except IndexError:
-		return type(source)()
+		return ''
 
 # TODO: Allow defining a new type, that has a scheme of attributes attached. (X is a new Type, X has a Shape of box3d, etc.)
 
@@ -23,7 +23,7 @@ def parse_line(index, line):
 	tokens = shlex.split(line, comments=False, posix=True)
 	unknown_count = 0
 
-	if get(tokens, 1) == 'has' and (get(tokens, 2) == 'a' or get(tokens, 2) == 'an') and get(tokens, 4) == 'of':
+	if get(tokens, 1).lower() == 'has' and (get(tokens, 2).lower() == 'a' or get(tokens, 2).lower() == 'an') and get(tokens, 4).lower() == 'of':
 		# x has a THING of VALUE
 		r['kind'] = 'metadata'
 		name = get(tokens, 0)
@@ -33,7 +33,7 @@ def parse_line(index, line):
 		r['content']['Name A'] = name
 		r['content']['Metadata'] = {}
 		r['content']['Metadata'][attribute] = value
-	elif get(tokens, 1) == 'is' and get(tokens, 2) == 'a':
+	elif get(tokens, 1).lower() == 'is' and get(tokens, 2).lower() == 'a':
 		r['kind'] = 'metadata'
 		name = get(tokens, 0)
 		attribute = 'Type'
@@ -42,7 +42,7 @@ def parse_line(index, line):
 		r['content']['Name A'] = name
 		r['content']['Metadata'] = {}
 		r['content']['Metadata'][attribute] = value
-	elif get(tokens, 1) == 'is' and get(tokens, 2) == 'connected' and get(tokens, 3) == 'to' and get(tokens, 5) == 'via':
+	elif get(tokens, 1).lower() == 'is' and get(tokens, 2).lower() == 'connected' and get(tokens, 3).lower() == 'to' and get(tokens, 5).lower() == 'via':
 		# x is connected to y via wifi
 		r['kind'] = 'statement'
 		name_a = get(tokens, 0)
@@ -53,7 +53,7 @@ def parse_line(index, line):
 		r['content']['Name B'] = name_b
 		r['content']['Relation'] = relation
 
-	elif get(tokens, 1) == 'is' and get(tokens, 2) == 'connected' and get(tokens, 3) == 'to':
+	elif get(tokens, 1).lower() == 'is' and get(tokens, 2).lower() == 'connected' and get(tokens, 3).lower() == 'to':
 		# x is connected to y
 		r['kind'] = 'statement'
 		name_a = get(tokens, 0)
@@ -62,7 +62,7 @@ def parse_line(index, line):
 		r['content']['Name A'] = name_a
 		r['content']['Name B'] = name_b
 		r['content']['Relation'] = 'ethernet'
-	elif get(tokens, 1) == 'connects' and get(tokens, 2) == 'to' and get(tokens, 4) == 'via':
+	elif get(tokens, 1).lower() == 'connects' and get(tokens, 2).lower() == 'to' and get(tokens, 4).lower() == 'via':
 		# x connects to y via wifi
 		r['kind'] = 'statement'
 		name_a = get(tokens, 0)
@@ -72,7 +72,7 @@ def parse_line(index, line):
 		r['content']['Name A'] = name_a
 		r['content']['Name B'] = name_b
 		r['content']['Relation'] = relation
-	elif get(tokens, 1) == 'connects' and get(tokens, 2) == 'to':
+	elif get(tokens, 1).lower() == 'connects' and get(tokens, 2).lower() == 'to':
 		# x connects to y
 		r['kind'] = 'statement'
 		name_a = get(tokens, 0)
