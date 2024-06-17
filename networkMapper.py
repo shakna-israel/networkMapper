@@ -214,20 +214,20 @@ def legend():
 	return """Legend:{prefix}LegendLoc has a Type of Location
 Legend:{prefix}LegendLoc has a Blurb of "All items may have a Blurb, such as this. They may also have any arbitrary attribute, such as an IPAddress, OS, or any named key."
 
-Ethernet:{prefix}LegendVMEth has a Shape of box3d
+Ethernet:{prefix}LegendVMEth has a Type of Note
 Ethernet:{prefix}LegendVMEth is connected to Legend:{prefix}LegendLoc via Ethernet
 Ethernet:{prefix}LegendVMEth has a Blurb of "Blue lines indicate an Ethernet Connection."
 
-WiFi:{prefix}LegendVMWifi has a Shape of box3d
+WiFi:{prefix}LegendVMWifi has a Type of Note
 WiFi:{prefix}LegendVMWifi is connected to Legend:{prefix}LegendLoc via WiFi
 WiFi:{prefix}LegendVMWifi has a Blurb of "Green lines indicate a WiFi Connection."
 
-Physical:{prefix}LegendVMPhys has a Shape of box3d
+Physical:{prefix}LegendVMPhys has a Type of Note
 Physical:{prefix}LegendVMPhys is connected to Legend:{prefix}LegendLoc via Physical
 Physical:{prefix}LegendVMPhys has a Blurb of "Black lines indicate a Physical Connection."
 
-Unknown:{prefix}LegendVMUknown has a Shape of box3d
-Unknown:{prefix}LegendVMUknown is connected to Legend:{prefix}LegendLoc
+Unknown:{prefix}LegendVMUknown has a Type of Note
+Unknown:{prefix}LegendVMUknown is connected to Legend:{prefix}LegendLoc via unknown
 Unknown:{prefix}LegendVMUknown has a Blurb of "Grey lines specify an unknown connection type."
 
 Router:{prefix}LegendRouter has a Type of Router
@@ -253,6 +253,7 @@ VM:{prefix}LegendVM is connected to Legend:{prefix}LegendLoc
 Unknown:{prefix}LegendUnknown has a Blurb of "no type given"
 Unknown:{prefix}Legend is connected to Legend:{prefix}LegendLoc
 
+Shape:{prefix}Legend2 has a Type of Note
 Shape:{prefix}Legend2 has a Shape of "triangle"
 Shape:{prefix}Legend2 has a Blurb of "Custom shapes are provided by the Shape attribute.\\nAnything that DOT/graphviz would understand is accepted."
 Shape:{prefix}Legend2 is connected to Legend:{prefix}LegendLoc via Physical
@@ -502,7 +503,7 @@ def cli():
 	parser.add_argument('-o', '--output-file', help='The output file to render.', required=True)
 	parser.add_argument('-l', '--legend', help='Add the legend to the output', action='store_true')
 	parser.add_argument('-nl', '--no-legend', dest='legend', action='store_false')
-	parser.set_defaults(legend=True)
+	parser.set_defaults(legend=False)
 
 	args = parser.parse_args()
 

@@ -1,6 +1,9 @@
 SignOff has a Type of e-signature
 SignOff has a Blurb of "James Milne"
-SignOff is connected to MyHouse via Approval
+SignOff is connected to MyGroup via Approval
+
+MyGroup has a Type of Group
+MyGroup connects to MyHouse via unknown
 
 MyHouse has a Type of Location
 
