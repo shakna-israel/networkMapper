@@ -180,13 +180,32 @@ def assemble_dtree(names, idents, tree):
 def retree(names, data):
 	proper_tree = []
 	for name in names:
-		subdata = data[name]
+		subdata = data[name].copy()
+
+		try:
+			subdata['relations']
+		except KeyError:
+			unknown_found = True
+			subdata['relations'] = [{'to': name, "kind":"unknown"}]
 
 		for relation in subdata['relations']:
 			row = {}
 			row['Name A'] = name
 			row['Name B'] = relation['to']
 			row['Relation'] = relation['kind']
+			proper_tree.append(row)
+
+	for name in names:
+		found = False
+		for row in proper_tree:
+			if row['Name A'] == name or row['Name B'] == name:
+				found = True
+				break
+		if not found:
+			row = {}
+			row['Name A'] = name
+			row['Name B'] = name
+			row['Relation'] = 'unknown'
 			proper_tree.append(row)
 
 	return proper_tree
@@ -243,9 +262,9 @@ def main(tree, output_filename, require_legend=True):
 	dot = Digraph(graph_attr = {
 		'splines':'ortho',
 		'strict': 'false',
-		'overlap': 'false'}, engine='neato')
-
-	#dot = Digraph(graph_attr = {"concentrate": "true", 'strict': 'false', 'overlap': 'false'})
+		'overlap': 'false'
+	},
+	engine='neato')
 
 	names = []
 	for i in tree:
@@ -441,6 +460,7 @@ def main(tree, output_filename, require_legend=True):
 			except IndexError:
 				colour_b = "black"
 
+			sub.node(name=idents[row['Name A']])
 			sub.node(idents[row['Name A']], label=label_a, tooltip = details_a, shape = shape_a, color=colour_a, margin=margin_a)
 
 			sub.node(name=idents[row['Name B']])
