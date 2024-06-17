@@ -62,11 +62,27 @@ def parse_line(index, line):
 		r['content']['Name A'] = name_a
 		r['content']['Name B'] = name_b
 		r['content']['Relation'] = 'ethernet'
+	elif get(tokens, 1) == 'connects' and get(tokens, 2) == 'to' and get(tokens, 4) == 'via':
+		# x connects to y via wifi
+		r['kind'] = 'statement'
+		name_a = get(tokens, 0)
+		name_b = get(tokens, 3)
+		relation = get(tokens, 5)
+
+		r['content']['Name A'] = name_a
+		r['content']['Name B'] = name_b
+		r['content']['Relation'] = relation
+	elif get(tokens, 1) == 'connects' and get(tokens, 2) == 'to':
+		# x connects to y
+		r['kind'] = 'statement'
+		name_a = get(tokens, 0)
+		name_b = get(tokens, 3)
+
+		r['content']['Name A'] = name_a
+		r['content']['Name B'] = name_b
+		r['content']['Relation'] = 'ethernet'
 	else:
 		print("WARNING: Line skipped.", line, file=sys.stderr)
-
-	# todo: y connects to x via
-	# todo: y connect to x
 
 	return r
 
