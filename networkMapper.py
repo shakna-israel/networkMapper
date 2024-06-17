@@ -294,13 +294,14 @@ def main(tree, output_filename, require_legend=True):
 		"pc": "box3d",
 		"phone": "box3d",
 		"virtualmachine": "circle",
-		"location": "house",
+		"location": "Msquare",
 		"unknown": "doublecircle",
 		"component": "component",
 		"note": "note",
 		"group": "folder",
 		"subgroup": "tab",
-		"e-signature": "signature"
+		"e-signature": "signature",
+		"site": "Msquare"
 	}
 	# TODO: Allow colour, other properties, overriding...?
 
@@ -400,7 +401,8 @@ def main(tree, output_filename, require_legend=True):
 				"ethernet": "blue",
 				"wifi": "green",
 				"physical": "black",
-				"other": "grey"
+				"other": "grey",
+				"unknown": "grey"
 			}
 
 			try:
@@ -493,7 +495,6 @@ def main(tree, output_filename, require_legend=True):
 	dot.format = p.suffix[1:]
 	return dot.render(p.stem)
 
-# TODO: Group types
 # TODO: Ranges to generate multiples according to a template.
 
 def cli():
