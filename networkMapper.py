@@ -267,6 +267,7 @@ def main(tree, output_filename, require_legend=True):
 	proper_tree = retree(names, data)
 
 	symbol_shapes = {
+		"server": "cylinder",
 		"router": "diamond",
 		"switch": "invtriangle",
 		"laptop": "box3d",
@@ -274,7 +275,12 @@ def main(tree, output_filename, require_legend=True):
 		"phone": "box3d",
 		"virtualmachine": "circle",
 		"location": "house",
-		"unknown": "doublecircle"
+		"unknown": "doublecircle",
+		"component": "component",
+		"note": "note",
+		"group": "folder",
+		"subgroup": "tab",
+		"e-signature": "signature"
 	}
 	# TODO: Allow colour, other properties, overriding...?
 
@@ -370,6 +376,7 @@ def main(tree, output_filename, require_legend=True):
 				label_b = row['Name B'].split(":", 1)[0]
 
 			colour_scheme = {
+				"telnet": "red",
 				"ethernet": "blue",
 				"wifi": "green",
 				"physical": "black",
@@ -382,13 +389,62 @@ def main(tree, output_filename, require_legend=True):
 				color_a = colour_scheme['other']
 
 			label_a = label_a + blurb_a + "\n" + details_a
+			try:
+				if data[row['Name A']]['meta']['Type'].lower() == "e-signature":
+					label_a = blurb_a
+			except KeyError:
+				pass
+
 			label_b = label_b + blurb_b + "\n" + details_b
+			try:
+				if data[row['Name B']]['meta']['Type'].lower() == "e-signature":
+					label_b = blurb_b
+			except KeyError:
+				pass
+				
 
 			sub.node(name=idents[row['Name A']])
-			sub.node(idents[row['Name A']], label=label_a, tooltip = details_a, shape = shape_a, fillcolor = "red", margin="1.2")
+
+			try:
+				if data[row['Name A']]['meta']['Type'].lower() == "e-signature":
+					margin_a="0.8"
+				else:
+					raise KeyError
+			except KeyError:
+				margin_a="1.2"
+
+			try:
+				if data[row['Name B']]['meta']['Type'].lower() == "e-signature":
+					margin_b="0.8"
+				else:
+					raise KeyError
+			except KeyError:
+				margin_b="1.2"
+
+			try:
+				if data[row['Name A']]['meta']['Type'].lower() == "unknown":
+					raise KeyError
+				else:
+					raise IndexError
+			except KeyError:
+				colour_a = "red"
+			except IndexError:
+				colour_a = "black"
+
+			try:
+				if data[row['Name B']]['meta']['Type'].lower() == "unknown":
+					raise KeyError
+				else:
+					raise IndexError
+			except KeyError:
+				colour_b = "red"
+			except IndexError:
+				colour_b = "black"
+
+			sub.node(idents[row['Name A']], label=label_a, tooltip = details_a, shape = shape_a, color=colour_a, margin=margin_a)
 
 			sub.node(name=idents[row['Name B']])
-			sub.node(idents[row['Name B']], label=label_b, tooltip = details_b, shape = shape_b, fillcolor = "red")
+			sub.node(idents[row['Name B']], label=label_b, tooltip = details_b, shape = shape_b, color=colour_b, margin=margin_b)
 
 			for rel in data[row['Name A']]['relations']:
 				o_a = idents[row['Name A']]
@@ -432,8 +488,6 @@ def cli():
 
 	tree = parse_file(args.input_file, args.legend)
 	main(tree, args.output_file, args.legend)
-
-	# TODO: Only render legend option...?
 
 if __name__ == "__main__":
 	cli()
