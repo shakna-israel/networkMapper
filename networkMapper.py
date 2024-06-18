@@ -12,6 +12,8 @@ def get(source, index):
 		return source[index]
 	except IndexError:
 		return ''
+	except KeyError:
+		return ''
 
 # TODO: Allow defining a new type, that has a scheme of attributes attached. (X is a new Type, X has a Shape of box3d, etc.)
 
@@ -312,9 +314,11 @@ def main(tree, output_filename, require_legend=True):
 				shape_a = symbol_shapes[data[row['Name A']]['meta']['Type'].lower().replace("virtual_machine", "virtualmachine").replace("virtual machine", "virtualmachine")]
 			except KeyError:
 				shape_a = symbol_shapes['unknown']
+			except AttributeError:
+				shape_a = symbol_shapes[data[row['Name A']]['meta']['Type'][0].lower()]
 
 			try:
-				shape_a = data[row['Name A']]['meta']['Shape']
+				shape_a = get(data[row['Name A']]['meta'], 'Shape') or shape_a
 			except KeyError:
 				pass
 
@@ -346,9 +350,11 @@ def main(tree, output_filename, require_legend=True):
 				shape_b = symbol_shapes[data[row['Name B']]['meta']['Type'].lower()]
 			except KeyError:
 				shape_b = symbol_shapes['unknown']
+			except AttributeError:
+				shape_b = symbol_shapes[data[row['Name B']]['meta']['Type'][0].lower()]
 
 			try:
-				shape_b = data[row['Name B']]['meta']['Shape']
+				shape_a = get(data[row['Name B']]['meta'], 'Shape') or shape_a
 			except KeyError:
 				pass
 
@@ -416,35 +422,42 @@ def main(tree, output_filename, require_legend=True):
 					label_a = blurb_a
 			except KeyError:
 				pass
+			except AttributeError:
+				pass
 
 			label_b = label_b + blurb_b + "\n" + details_b
 			try:
-				if data[row['Name B']]['meta']['Type'].lower() == "e-signature":
+				if get(data[row['Name B']]['meta'], 'Type').lower() == "e-signature":
 					label_b = blurb_b
 			except KeyError:
 				pass
-				
+			except AttributeError:
+				pass	
 
 			sub.node(name=idents[row['Name A']])
 
 			try:
-				if data[row['Name A']]['meta']['Type'].lower() == "e-signature":
+				if get(data[row['Name A']]['meta'], 'Type').lower() == "e-signature":
 					margin_a="0.8"
 				else:
 					raise KeyError
 			except KeyError:
 				margin_a="1.2"
+			except AttributeError:
+				margin_a="1.2"
 
 			try:
-				if data[row['Name B']]['meta']['Type'].lower() == "e-signature":
+				if get(data[row['Name B']]['meta'], 'Type').lower() == "e-signature":
 					margin_b="0.8"
 				else:
 					raise KeyError
 			except KeyError:
 				margin_b="1.2"
+			except AttributeError:
+				margin_a="1.2"
 
 			try:
-				if data[row['Name A']]['meta']['Type'].lower() == "unknown":
+				if get(data[row['Name A']]['meta'], 'Type').lower() == "unknown":
 					raise KeyError
 				else:
 					raise IndexError
@@ -452,15 +465,19 @@ def main(tree, output_filename, require_legend=True):
 				colour_a = "red"
 			except IndexError:
 				colour_a = "black"
+			except AttributeError:
+				colour_a = "black"
 
 			try:
-				if data[row['Name B']]['meta']['Type'].lower() == "unknown":
+				if get(data[row['Name B']]['meta'], 'Type') == "unknown":
 					raise KeyError
 				else:
 					raise IndexError
 			except KeyError:
 				colour_b = "red"
 			except IndexError:
+				colour_b = "black"
+			except AttributeError:
 				colour_b = "black"
 
 			sub.node(name=idents[row['Name A']])
